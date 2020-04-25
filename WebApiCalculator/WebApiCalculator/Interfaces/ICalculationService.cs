@@ -8,9 +8,6 @@ namespace WebApiCalculator.Interfaces
 {
     public interface ICalculationService
     {
-        public CalculationModel CalculateOperationResult(CalculationModel calculationModel);
-        Task WriteCalculationLogAsync(CalculationModel calculationModel);       
-        Task<string> ReadCalculationLogAsync();
-        Task<string> ReadCalculationLogFilteredByOperationSignAsync(string operationSign);
+        CalculationModel CalculateOperationResult(CalculationModel calculationModel);     
     }
 }

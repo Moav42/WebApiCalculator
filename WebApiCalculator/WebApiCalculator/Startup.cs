@@ -31,6 +31,8 @@ namespace WebApiCalculator
 
             services.AddScoped<ICalculationService, CalculationService>();
 
+            services.AddScoped<ICalculationLoggingService, CalculationLoggingService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web Api Calculator", Version = "v1" });

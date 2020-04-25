@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebApiCalculator.Exceptions;
 using WebApiCalculator.Interfaces;
 using WebApiCalculator.Models;
 
@@ -14,11 +15,13 @@ namespace WebApiCalculator.Controllers
     [ApiController]
     public class CalculatorController : ControllerBase
     {
-        public readonly ICalculationService _calculationService;
+        private readonly ICalculationService _calculationService;
+        private readonly ICalculationLoggingService _calculationLoggingService;
 
-        public CalculatorController(ICalculationService calculationService)
+        public CalculatorController(ICalculationService calculationService, ICalculationLoggingService calculationLoggingService)
         {
             _calculationService = calculationService;
+            _calculationLoggingService = calculationLoggingService;
         }
 
         [HttpPost]
@@ -28,14 +31,14 @@ namespace WebApiCalculator.Controllers
             {
                 _calculationService.CalculateOperationResult(calculationModel);
             }
-            catch (Exception ex)
+            catch (CalculationExceptions ex)
             {
                 return BadRequest(ex.Message);
             }
 
-            await _calculationService.WriteCalculationLogAsync(calculationModel);
+            await _calculationLoggingService.WriteCalculationLogAsync(calculationModel);
 
-            return Ok(calculationModel.Result);
+            return Ok(calculationModel);
         }
 
         [HttpGet("log")]
@@ -45,11 +48,11 @@ namespace WebApiCalculator.Controllers
 
             if (String.IsNullOrEmpty(operationSign))
             {
-                log = await _calculationService.ReadCalculationLogAsync();
+                log = await _calculationLoggingService.ReadCalculationLogAsync();
             }
             else
             {
-                log = await _calculationService.ReadCalculationLogFilteredByOperationSignAsync(operationSign);
+                log = await _calculationLoggingService.ReadCalculationLogFilteredByOperationSignAsync(operationSign);
             }
 
             return Ok(log);
